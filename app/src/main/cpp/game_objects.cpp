@@ -116,17 +116,19 @@ void GameBoard::calculateAdjacentMines() {
 
     for (int32_t y = 0; y < height; y++) {
         for (int32_t x = 0; x < width; x++) {
-            if (not board[y][x].isMine) {
-                int32_t count = 0;
-                for (const auto &delta: DELTA) {
-                    int32_t nx = x + delta.first;
-                    int32_t ny = y + delta.second;
-                    if (isInBounds(nx, ny) and board[ny][nx].isMine) {
-                        count += 1;
-                    }
-                }
-                board[y][x].adjacentMines = count;
+            if (board[y][x].isMine) {
+                continue;
             }
+
+            int32_t count = 0;
+            for (const auto &delta: DELTA) {
+                int32_t nx = x + delta.first;
+                int32_t ny = y + delta.second;
+                if (isInBounds(nx, ny) and board[ny][nx].isMine) {
+                    count += 1;
+                }
+            }
+            board[y][x].adjacentMines = count;
         }
     }
 }

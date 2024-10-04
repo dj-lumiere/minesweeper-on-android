@@ -8,6 +8,8 @@ class MainActivity : GameActivity() {
         init {
             System.loadLibrary("minesweeper")
         }
+
+
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
