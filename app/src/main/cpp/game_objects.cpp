@@ -48,16 +48,14 @@ void GameBoard::revealCell(int32_t x, int32_t y) {
             if (board[nextY][nextX].isMine) {
                 continue;
             }
-            board[nextY][nextX].isMine = true;
+            board[nextY][nextX].isRevealed = true;
             stack.emplace_back(nextX, nextY);
         }
     }
 }
 
 void GameBoard::toggleFlag(int32_t x, int32_t y) {
-    if (isInBounds(x, y) and not board[y][x].isRevealed) {
-        board[y][x].isFlagged = not board[y][x].isFlagged;
-    }
+    board[y][x].isFlagged = not board[y][x].isFlagged;
 }
 
 void GameBoard::updateGameStatus() {

@@ -40,7 +40,7 @@ class MainActivity : GameActivity() {
     private val gridWidth = 10
     private val gridHeight = 10
     private val mineCount = 20
-    private lateinit var gameState:GameStatus
+    private lateinit var gameState: GameStatus
     private var isFirstClickFlag = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -111,13 +111,16 @@ class MainActivity : GameActivity() {
             }
         }
         lifecycleScope.launch {
-            gameState = withContext(Dispatchers.Default) {
+            withContext(Dispatchers.Default) {
                 revealCell(gameBoardPtr, x, y)
+            }
+            gameState = withContext(Dispatchers.Default) {
                 getGameState(gameBoardPtr)
             }
             for (y2 in 0 until gridHeight) {
                 for (x2 in 0 until gridWidth) {
-                    updateCellUI(x2, y2, button)
+                    val buttonToUpdate = gameBoardLayout.getChildAt(y2 * gridWidth + x2) as Button
+                    updateCellUI(x2, y2, buttonToUpdate)
                 }
             }
             Log.d(TAG, "onCellClicked: $gameState")
@@ -133,6 +136,7 @@ class MainActivity : GameActivity() {
                     revealAllMines()
                     disableAllButtons()
                 }
+
                 else -> {
                     return@launch
                 }
