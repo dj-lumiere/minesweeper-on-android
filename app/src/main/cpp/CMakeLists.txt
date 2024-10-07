@@ -9,6 +9,9 @@ project("minesweeper")
 # one used for loading in your Kotlin/Java or AndroidManifest.txt files.
 add_library(minesweeper SHARED
         main.cpp
+        native-lib.cpp
+        game_objects.cpp
+        game_objects.h
         AndroidOut.cpp
         Renderer.cpp
         Shader.cpp

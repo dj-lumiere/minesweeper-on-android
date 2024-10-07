@@ -17,9 +17,6 @@ GameBoard* gameBoard = nullptr;
 // Initialize the GameBoard
 JNIEXPORT jlong JNICALL
 Java_com_lumi_minesweeper_MainActivity_initGameBoard(JNIEnv* env, jobject /* this */, jint width, jint height, jint mineCount) {
-    if (gameBoard != nullptr) {
-        delete gameBoard;
-    }
     gameBoard = new GameBoard(width, height, mineCount);
     return reinterpret_cast<jlong>(gameBoard);
 }
@@ -40,7 +37,7 @@ Java_com_lumi_minesweeper_MainActivity_revealCell(JNIEnv* env, jobject /* this *
     if (board != nullptr) {
         board->revealCell(x, y);
         board->updateGameStatus();
-        return static_cast<jint>(board->getState());
+        return static_cast<jint>(board->state);
     }
     return -1; // Error state
 }
@@ -83,7 +80,7 @@ Java_com_lumi_minesweeper_MainActivity_getCell(JNIEnv* env, jobject /* this */, 
     env->SetBooleanField(cellDataObj, isMineField, cell.isMine);
     env->SetBooleanField(cellDataObj, isRevealedField, cell.isRevealed);
     env->SetBooleanField(cellDataObj, isFlaggedField, cell.isFlagged);
-    env->SetIntField(cellDataObj, adjacentMinesField, cell.adjacentMines);
+    env->SetIntField(cellDataObj, adjacentMinesField, static_cast<int>(cell.adjacentMines));
 
     return cellDataObj;
 }
@@ -93,7 +90,7 @@ JNIEXPORT jint JNICALL
 Java_com_lumi_minesweeper_MainActivity_getGameState(JNIEnv* env, jobject /* this */, jlong gameBoardPtr) {
     if (gameBoardPtr != 0) {
         GameBoard* board = reinterpret_cast<GameBoard*>(gameBoardPtr);
-        return static_cast<jint>(board->getState());
+        return static_cast<jint>(board->state);
     }
     return -1; // Error state
 }

@@ -35,7 +35,7 @@ class MainActivity : AppCompatActivity() {
     external fun cleanup(gameBoardPtr: Long)
 
     private lateinit var gameBoardLayout: GridLayout
-    private var gameBoardPtr: Long = 0L
+    private var gameBoardPtr = 0L
     private val gridWidth = 10
     private val gridHeight = 10
     private val mineCount = 20
@@ -58,6 +58,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun createBoardUI() {
+        gameBoardLayout = binding.gameBoard
         gameBoardLayout.columnCount = gridWidth
         gameBoardLayout.rowCount = gridHeight
         gameBoardLayout.removeAllViews()

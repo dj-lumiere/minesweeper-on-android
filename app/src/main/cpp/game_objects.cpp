@@ -71,7 +71,7 @@ void GameBoard::updateGameStatus() {
             }
         }
     }
-    state = VICTORY
+    state = VICTORY;
 }
 
 const Cell &GameBoard::getCell(int32_t x, int32_t y) const {

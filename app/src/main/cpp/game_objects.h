@@ -39,6 +39,7 @@ public:
     int32_t getWidth() const;
 
     int32_t getHeight() const;
+    gameStatus state;
 
 private:
     void placeMines(int32_t firstClickX, int32_t firstClickY);
@@ -50,7 +51,6 @@ private:
     int32_t width;
     int32_t height;
     int32_t mineCount;
-    gameStatus state;
     std::vector<std::pair<int32_t, int32_t>> mines;
     std::vector<std::vector<Cell>> board;
 };
