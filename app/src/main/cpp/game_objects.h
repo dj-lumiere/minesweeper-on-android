@@ -15,11 +15,12 @@ struct Cell {
     int32_t adjacentMines;
 };
 
-enum gameStatus{
-    STARTED,
-    ONGOING,
-    STEPPED_MINE,
-    VICTORY
+enum GameStatus {
+    ERROR = -1,
+    STARTED = 0,
+    ONGOING = 1,
+    STEPPED_MINE = 2,
+    VICTORY = 3
 };
 
 class GameBoard {
@@ -39,7 +40,8 @@ public:
     int32_t getWidth() const;
 
     int32_t getHeight() const;
-    gameStatus state;
+
+    GameStatus state;
 
 private:
     void placeMines(int32_t firstClickX, int32_t firstClickY);

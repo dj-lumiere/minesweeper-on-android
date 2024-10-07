@@ -6,9 +6,6 @@
 #include <string>
 #include "game_objects.h"
 
-// Change from Java_com_example_minesweeper_MainActivity_*
-// To Java_com_lumi_minesweeper_MainActivity_*
-
 extern "C" {
 
 // Pointer to the GameBoard instance
@@ -24,28 +21,26 @@ Java_com_lumi_minesweeper_MainActivity_initGameBoard(JNIEnv* env, jobject /* thi
 // Initialize the board after first click
 JNIEXPORT void JNICALL
 Java_com_lumi_minesweeper_MainActivity_initializeBoard(JNIEnv* env, jobject /* this */, jlong gameBoardPtr, jint firstClickX, jint firstClickY) {
-    GameBoard* board = reinterpret_cast<GameBoard*>(gameBoardPtr);
+    auto* board = reinterpret_cast<GameBoard*>(gameBoardPtr);
     if (board != nullptr) {
         board->initializeBoard(firstClickX, firstClickY);
     }
 }
 
 // Reveal a cell
-JNIEXPORT jint JNICALL
+JNIEXPORT void JNICALL
 Java_com_lumi_minesweeper_MainActivity_revealCell(JNIEnv* env, jobject /* this */, jlong gameBoardPtr, jint x, jint y) {
-    GameBoard* board = reinterpret_cast<GameBoard*>(gameBoardPtr);
+    auto* board = reinterpret_cast<GameBoard*>(gameBoardPtr);
     if (board != nullptr) {
         board->revealCell(x, y);
         board->updateGameStatus();
-        return static_cast<jint>(board->state);
     }
-    return -1; // Error state
 }
 
 // Toggle a flag on a cell
 JNIEXPORT void JNICALL
 Java_com_lumi_minesweeper_MainActivity_toggleFlag(JNIEnv* env, jobject /* this */, jlong gameBoardPtr, jint x, jint y) {
-    GameBoard* board = reinterpret_cast<GameBoard*>(gameBoardPtr);
+    auto* board = reinterpret_cast<GameBoard*>(gameBoardPtr);
     if (board != nullptr) {
         board->toggleFlag(x, y);
     }
@@ -56,7 +51,7 @@ JNIEXPORT jobject JNICALL
 Java_com_lumi_minesweeper_MainActivity_getCell(JNIEnv* env, jobject /* this */, jlong gameBoardPtr, jint x, jint y) {
     if (gameBoardPtr == 0) return nullptr;
 
-    GameBoard* board = reinterpret_cast<GameBoard*>(gameBoardPtr);
+    auto* board = reinterpret_cast<GameBoard*>(gameBoardPtr);
     const Cell& cell = board->getCell(x, y);
 
     // Find the CellData class
@@ -86,21 +81,24 @@ Java_com_lumi_minesweeper_MainActivity_getCell(JNIEnv* env, jobject /* this */, 
 }
 
 // Get game state
-JNIEXPORT jint JNICALL
+JNIEXPORT jobject JNICALL
 Java_com_lumi_minesweeper_MainActivity_getGameState(JNIEnv* env, jobject /* this */, jlong gameBoardPtr) {
     if (gameBoardPtr != 0) {
-        GameBoard* board = reinterpret_cast<GameBoard*>(gameBoardPtr);
-        return static_cast<jint>(board->state);
+        auto* board = reinterpret_cast<GameBoard*>(gameBoardPtr);
+        jclass gameStatusClass = env->FindClass("com/lumi/minesweeper/GameStatus");
+        jmethodID valueOfMethod = env->GetStaticMethodID(gameStatusClass, "valueOf", "(Ljava/lang/String;)Lcom/lumi/minesweeper/GameStatus;");
+        return env->CallStaticObjectMethod(gameStatusClass, valueOfMethod, static_cast<int>(board->state));
     }
-    return -1; // Error state
+    return nullptr; // Error state
 }
 
 // Clean up the GameBoard instance
 JNIEXPORT void JNICALL
 Java_com_lumi_minesweeper_MainActivity_cleanup(JNIEnv* env, jobject /* this */, jlong gameBoardPtr) {
-    GameBoard* board = reinterpret_cast<GameBoard*>(gameBoardPtr);
+    auto* board = reinterpret_cast<GameBoard*>(gameBoardPtr);
     if (board != nullptr) {
         delete board;
+        gameBoard = nullptr;
     }
 }
 

@@ -22,7 +22,7 @@
             </intent-filter>
 
             <meta-data
-                android:name="android.app.lib_name"
+                android:name="com.lumi.minesweeper"
                 android:value="minesweeper" />
         </activity>
     </application>

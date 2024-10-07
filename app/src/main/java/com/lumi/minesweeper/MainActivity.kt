@@ -1,6 +1,7 @@
 package com.lumi.minesweeper
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.GridLayout
@@ -8,30 +9,30 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.google.androidgamesdk.GameActivity
 import com.lumi.minesweeper.databinding.ActivityMainBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class MainActivity : AppCompatActivity() {
+private const val TAG = "MainActivity_minesweeper"
+
+class MainActivity : GameActivity() {
     private lateinit var binding: ActivityMainBinding
 
     companion object {
         init {
             System.loadLibrary("minesweeper") // Ensure this matches your C++ library name
         }
-
-        const val STEPPED_MINE = 2
-        const val VICTORY = 3
     }
 
     // Declare native methods
     external fun initGameBoard(width: Int, height: Int, mineCount: Int): Long
     external fun initializeBoard(gameBoardPtr: Long, firstClickX: Int, firstClickY: Int)
-    external fun revealCell(gameBoardPtr: Long, x: Int, y: Int): Int
+    external fun revealCell(gameBoardPtr: Long, x: Int, y: Int)
     external fun toggleFlag(gameBoardPtr: Long, x: Int, y: Int)
     external fun getCell(gameBoardPtr: Long, x: Int, y: Int): CellData
-    external fun getGameState(gameBoardPtr: Long): Int
+    external fun getGameState(gameBoardPtr: Long): GameStatus
     external fun cleanup(gameBoardPtr: Long)
 
     private lateinit var gameBoardLayout: GridLayout
@@ -39,6 +40,7 @@ class MainActivity : AppCompatActivity() {
     private val gridWidth = 10
     private val gridHeight = 10
     private val mineCount = 20
+    private lateinit var gameState:GameStatus
     private var isFirstClickFlag = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,6 +50,7 @@ class MainActivity : AppCompatActivity() {
 
         // Initialize the game board
         gameBoardPtr = initGameBoard(gridWidth, gridHeight, mineCount)
+        gameState = getGameState(gameBoardPtr)
         createBoardUI()
     }
 
@@ -75,7 +78,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 button.layoutParams = params
                 button.text = ""
-                button.setBackgroundColor(getColor(android.R.color.holo_blue_light))
+                button.setBackgroundColor(getColor(android.R.color.white))
 
                 // Set click listeners
                 button.setOnClickListener {
@@ -100,27 +103,33 @@ class MainActivity : AppCompatActivity() {
                     initializeBoard(gameBoardPtr, x, y)
                 }
                 button.isEnabled = false
-                updateCellUI(x, y, button)
             }
-        } else {
-            lifecycleScope.launch {
-                val gameState = withContext(Dispatchers.Default) {
-                    revealCell(gameBoardPtr, x, y)
+        }
+        lifecycleScope.launch {
+            gameState = withContext(Dispatchers.Default) {
+                revealCell(gameBoardPtr, x, y)
+                getGameState(gameBoardPtr)
+            }
+            for (y2 in 0 until gridHeight) {
+                for (x2 in 0 until gridWidth) {
+                    updateCellUI(x2, y2, button)
                 }
-                updateCellUI(x, y, button)
+            }
+            Log.d(TAG, "onCellClicked: $gameState")
+            when (gameState) {
+                GameStatus.STEPPED_MINE -> {
+                    Toast.makeText(this@MainActivity, "Game Over!", Toast.LENGTH_SHORT).show()
+                    revealAllMines()
+                    disableAllButtons()
+                }
 
-                when (gameState) {
-                    STEPPED_MINE -> {
-                        Toast.makeText(this@MainActivity, "Game Over!", Toast.LENGTH_SHORT).show()
-                        revealAllMines()
-                        disableAllButtons()
-                    }
-
-                    VICTORY -> {
-                        Toast.makeText(this@MainActivity, "You Win!", Toast.LENGTH_SHORT).show()
-                        revealAllMines()
-                        disableAllButtons()
-                    }
+                GameStatus.VICTORY -> {
+                    Toast.makeText(this@MainActivity, "You Win!", Toast.LENGTH_SHORT).show()
+                    revealAllMines()
+                    disableAllButtons()
+                }
+                else -> {
+                    return@launch
                 }
             }
         }
@@ -137,7 +146,7 @@ class MainActivity : AppCompatActivity() {
                 getGameState(gameBoardPtr)
             }
 
-            if (gameState == VICTORY) {
+            if (gameState == GameStatus.VICTORY) {
                 Toast.makeText(this@MainActivity, "You Win!", Toast.LENGTH_SHORT).show()
                 revealAllMines()
                 disableAllButtons()
