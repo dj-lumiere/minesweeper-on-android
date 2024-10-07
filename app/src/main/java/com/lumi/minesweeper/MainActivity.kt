@@ -83,6 +83,11 @@ class MainActivity : GameActivity() {
                 // Set click listeners
                 button.setOnClickListener {
                     onCellClicked(x, y, button)
+                    for (y2 in 0 until gridHeight) {
+                        for (x2 in 0 until gridWidth) {
+                            Log.d(TAG, "createBoardUI: $x2, $y2, ${getCell(gameBoardPtr, x2, y2)}")
+                        }
+                    }
                 }
 
                 button.setOnLongClickListener {

@@ -66,7 +66,7 @@ void GameBoard::updateGameStatus() {
     }
     for (const auto &row: board) {
         for (const auto &cell: row) {
-            if (not cell.isMine and not cell.isRevealed) {
+            if (cell.isMine and not cell.isRevealed) {
                 return;
             }
         }
@@ -90,14 +90,18 @@ void GameBoard::placeMines(int32_t firstClickX, int32_t firstClickY) {
     std::vector<std::pair<int32_t, int32_t>> positions;
     for (int32_t y = 0; y < height; y++) {
         for (int32_t x = 0; x < width; x++) {
-            if (not(x == firstClickX and y == firstClickY)) {
-                positions.emplace_back(x, y);
+            if (x == firstClickX and y == firstClickY) {
+                continue;
             }
+            if (board[y][x].isMine){
+                continue;
+            }
+            positions.emplace_back(x, y);
         }
     }
 
     std::shuffle(positions.begin(), positions.end(), std::mt19937());
-    for (int32_t i = 0; i < mineCount; i++) {
+    for (int32_t i = 0; i < 1; i++) {
         int32_t x = positions[i].first;
         int32_t y = positions[i].second;
         board[y][x].isMine = true;

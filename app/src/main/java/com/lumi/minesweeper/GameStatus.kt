@@ -1,6 +1,6 @@
 package com.lumi.minesweeper
 
-enum class GameStatus {
+enum class GameStatus() {
     ERROR,
     STARTED,
     ONGOING,

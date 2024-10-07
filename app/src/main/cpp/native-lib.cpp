@@ -85,12 +85,52 @@ JNIEXPORT jobject JNICALL
 Java_com_lumi_minesweeper_MainActivity_getGameState(JNIEnv* env, jobject /* this */, jlong gameBoardPtr) {
     if (gameBoardPtr != 0) {
         auto* board = reinterpret_cast<GameBoard*>(gameBoardPtr);
+
+        // Get the GameStatus class reference
         jclass gameStatusClass = env->FindClass("com/lumi/minesweeper/GameStatus");
+        if (gameStatusClass == nullptr) {
+            return nullptr; // Error, class not found
+        }
+
+        // Convert C++ enum to Java string name of the enum constant
+        const char* enumName = nullptr;
+        switch (board->state) {
+            case GameStatus::ERROR:
+                enumName = "ERROR";
+                break;
+            case GameStatus::STARTED:
+                enumName = "STARTED";
+                break;
+            case GameStatus::ONGOING:
+                enumName = "ONGOING";
+                break;
+            case GameStatus::STEPPED_MINE:
+                enumName = "STEPPED_MINE";
+                break;
+            case GameStatus::VICTORY:
+                enumName = "VICTORY";
+                break;
+            default:
+                return nullptr; // Unknown state, handle as error
+        }
+
+        jstring jEnumName = env->NewStringUTF(enumName);
+        if (jEnumName == nullptr) {
+            return nullptr; // Error, could not create string
+        }
+
+        // Use the valueOf method to get the enum constant
         jmethodID valueOfMethod = env->GetStaticMethodID(gameStatusClass, "valueOf", "(Ljava/lang/String;)Lcom/lumi/minesweeper/GameStatus;");
-        return env->CallStaticObjectMethod(gameStatusClass, valueOfMethod, static_cast<int>(board->state));
+        if (valueOfMethod == nullptr) {
+            return nullptr; // Error, method not found
+        }
+
+        return env->CallStaticObjectMethod(gameStatusClass, valueOfMethod, jEnumName);
     }
+
     return nullptr; // Error state
 }
+
 
 // Clean up the GameBoard instance
 JNIEXPORT void JNICALL
