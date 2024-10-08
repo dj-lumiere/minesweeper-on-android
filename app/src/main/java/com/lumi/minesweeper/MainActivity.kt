@@ -27,13 +27,13 @@ class MainActivity : GameActivity() {
     }
 
     // Declare native methods
-    external fun initGameBoard(width: Int, height: Int, mineCount: Int): Long
-    external fun initializeBoard(gameBoardPtr: Long, firstClickX: Int, firstClickY: Int)
-    external fun revealCell(gameBoardPtr: Long, x: Int, y: Int)
-    external fun toggleFlag(gameBoardPtr: Long, x: Int, y: Int)
-    external fun getCell(gameBoardPtr: Long, x: Int, y: Int): CellData
-    external fun getGameState(gameBoardPtr: Long): GameStatus
-    external fun cleanup(gameBoardPtr: Long)
+    private external fun initGameBoard(width: Int, height: Int, mineCount: Int): Long
+    private external fun initializeBoard(gameBoardPtr: Long, firstClickX: Int, firstClickY: Int)
+    private external fun revealCell(gameBoardPtr: Long, x: Int, y: Int)
+    private external fun toggleFlag(gameBoardPtr: Long, x: Int, y: Int)
+    private external fun getCell(gameBoardPtr: Long, x: Int, y: Int): CellData
+    private external fun getGameState(gameBoardPtr: Long): GameStatus
+    private external fun cleanup(gameBoardPtr: Long)
 
     private lateinit var gameBoardLayout: GridLayout
     private var gameBoardPtr = 0L
@@ -182,7 +182,7 @@ class MainActivity : GameActivity() {
             button.setBackgroundColor(getColor(android.R.color.holo_orange_light))
         } else {
             button.text = ""
-            button.setBackgroundColor(getColor(android.R.color.holo_blue_light))
+            button.setBackgroundColor(getColor(android.R.color.white))
         }
     }
 

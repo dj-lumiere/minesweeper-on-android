@@ -49,6 +49,9 @@ void GameBoard::revealCell(int32_t x, int32_t y) {
                 continue;
             }
             board[nextY][nextX].isRevealed = true;
+            if (board[nextY][nextX].adjacentMines > 0) {
+                continue;
+            }
             stack.emplace_back(nextX, nextY);
         }
     }
@@ -91,15 +94,16 @@ void GameBoard::placeMines(int32_t firstClickX, int32_t firstClickY) {
             if (x == firstClickX and y == firstClickY) {
                 continue;
             }
-            if (board[y][x].isMine){
+            if (board[y][x].isMine) {
                 continue;
             }
             positions.emplace_back(x, y);
         }
     }
-
-    std::shuffle(positions.begin(), positions.end(), std::mt19937());
-    for (int32_t i = 0; i < 1; i++) {
+    std::random_device rd;
+    std::mt19937 g(rd());
+    std::shuffle(positions.begin(), positions.end(), g);
+    for (int32_t i = 0; i < mineCount; i++) {
         int32_t x = positions[i].first;
         int32_t y = positions[i].second;
         board[y][x].isMine = true;
