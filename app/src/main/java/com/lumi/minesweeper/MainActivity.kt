@@ -151,7 +151,7 @@ class MainActivity : GameActivity() {
             }
             updateCellUI(x, y, button)
 
-            val gameState = withContext(Dispatchers.Default) {
+            gameState = withContext(Dispatchers.Default) {
                 getGameState(gameBoardPtr)
             }
 
