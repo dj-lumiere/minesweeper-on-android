@@ -22,7 +22,9 @@ void GameBoard::revealCell(int32_t x, int32_t y) {
         this->state = STEPPED_MINE;
     }
     board[y][x].isRevealed = true;
-
+    if (board[y][x].adjacentMines > 0){
+        return;
+    }
     std::vector<std::pair<int32_t, int32_t>> stack;
     stack.emplace_back(x, y);
     const std::vector<std::pair<int32_t, int32_t>> DELTA2 = {{0,  1},
@@ -67,7 +69,7 @@ void GameBoard::updateGameStatus() {
     }
     for (const auto &row: board) {
         for (const auto &cell: row) {
-            if (cell.isMine and not cell.isRevealed) {
+            if (cell.isMine and not (cell.isRevealed or cell.isFlagged)) {
                 return;
             }
         }
